@@ -6,6 +6,7 @@ import networkx as nx
 import numpy as np
 import scipy.sparse as sp
 import argparse
+from data.amazon_stream_data_handler import AmazonStreamDataHandler
 
 # -------- Generate community graphs --------
 def n_community(num_communities, max_nodes, p_inter=0.05):
@@ -241,6 +242,24 @@ def save_dataset(data_dir, graphs, save_name):
         f.write(save_name + '\n')
         f.write(str(len(graphs)))
 
+def gen_stream_graph_list():
+    data = AmazonStreamDataHandler(data_name="amazon_instant_video_15_v8")
+    data.load_stream(t=0)
+    graphs = []
+    # generate sample graphs
+    for i in range(100):
+        nodes, adj_list, features = data.sameple_graph()
+        G = nx.from_dict_of_lists(adj_list)
+        for node in G.nodes():
+            G.nodes[node]['feature'] = data.stream_features[node]
+            G.nodes[node]['label'] = data.stream_labels[node]
+
+        G.remove_edges_from(nx.selfloop_edges(G))
+        G = nx.convert_node_labels_to_integers(G)
+        graphs.append(G)
+
+    return graphs
+
 
 # -------- Generate datasets --------
 def generate_dataset(data_dir='data', dataset='community_small'):
@@ -267,8 +286,14 @@ def generate_dataset(data_dir='data', dataset='community_small'):
         save_dataset(data_dir, graphs, dataset)
         print(max([g.number_of_nodes() for g in graphs]))
 
+    elif dataset == 'amazon':
+        graphs = gen_stream_graph_list()
+        save_dataset(data_dir, graphs, dataset)
+        print(max([g.number_of_nodes() for g in graphs]))
+
+
     else:
-        raise NotImplementedError(f'Dataset {datset} not supproted.')
+        raise NotImplementedError(f'Dataset {dataset} not supproted.')
 
 
 if __name__ == "__main__":
@@ -276,6 +301,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate dataset')
     parser.add_argument('--data-dir', type=str, default='data', help='directory to save the generated dataset')
     parser.add_argument('--dataset', type=str, default='community_small', help='dataset to generate',
-                        choices=['ego_small', 'community_small', 'ENZYMES', 'grid'])
+                        choices=['ego_small', 'community_small', 'ENZYMES', 'grid', 'amazon'])
     args = parser.parse_args()
     generate_dataset(args.data_dir, args.dataset)

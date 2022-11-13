@@ -62,7 +62,10 @@ class Sampler(object):
         for r in range(num_sampling_rounds):
             t_start = time.time()
 
-            self.init_flags = init_flags(self.train_graph_list, self.configt).to(self.device[0])
+            if torch.cuda.is_available():
+                self.init_flags = init_flags(self.train_graph_list, self.configt).to(self.device[0])
+            else:
+                self.init_flags = init_flags(self.train_graph_list, self.configt)
 
             x, adj, _ = self.sampling_fn(self.model_x, self.model_adj, self.init_flags)
 

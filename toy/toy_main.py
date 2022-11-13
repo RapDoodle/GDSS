@@ -139,6 +139,6 @@ if __name__=='__main__':
     trainer = Trainer(config)
     sampler = Sampler(config)
 
-    ts = time.strftime('%b%d-%H:%M:%S', time.gmtime())
+    ts = time.strftime('%b%d-%H-%M-%S', time.gmtime())
     trainer.train(ts)
     sampler.sample(ts)

@@ -8,7 +8,7 @@ from sampler import Sampler, Sampler_mol
 
 
 def main(work_type_args):
-    ts = time.strftime('%b%d-%H:%M:%S', time.gmtime())
+    ts = time.strftime('%b%d-%H-%M-%S', time.gmtime())
     args = Parser().parse()
     config = get_config(args.config, args.seed)
 

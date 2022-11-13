@@ -53,7 +53,8 @@ def load_model_optimizer(params, config_train, device):
     if isinstance(device, list):
         if len(device) > 1:
             model = torch.nn.DataParallel(model, device_ids=device)
-        model = model.to(f'cuda:{device[0]}')
+        if torch.cuda.is_available():
+            model = model.to(f'cuda:{device[0]}')
     
     optimizer = torch.optim.Adam(model.parameters(), lr=config_train.lr, 
                                     weight_decay=config_train.weight_decay)
@@ -192,7 +193,8 @@ def load_model_from_ckpt(params, state_dict, device):
     if isinstance(device, list):
         if len(device) > 1:
             model = torch.nn.DataParallel(model, device_ids=device)
-        model = model.to(f'cuda:{device[0]}')
+        if torch.cuda.is_available():
+            model = model.to(f'cuda:{device[0]}')
     return model
 
 

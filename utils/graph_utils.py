@@ -106,12 +106,15 @@ def quantize_mol(adjs):
     return np.array(adjs.to(torch.int64))
 
 
-def adjs_to_graphs(adjs, is_cuda=False):
+def adjs_to_graphs(adjs,xs, is_cuda=False):
     graph_list = []
-    for adj in adjs:
+    for adj,x in zip(adjs,xs):
         if is_cuda:
             adj = adj.detach().cpu().numpy()
+            x = x[node].detach().cpu().numpy()
         G = nx.from_numpy_matrix(adj)
+        for node in G.nodes:
+            G.nodes[node]["features"] = x[node]
         G.remove_edges_from(nx.selfloop_edges(G))
         G.remove_nodes_from(list(nx.isolates(G)))
         if G.number_of_nodes() < 1:

@@ -72,7 +72,7 @@ class Sampler(object):
             logger.log(f"Round {r} : {time.time()-t_start:.2f}s")
 
             samples_int = quantize(adj)
-            gen_graph_list.extend(adjs_to_graphs(samples_int, True))
+            gen_graph_list.extend(adjs_to_graphs(samples_int,x, True))
 
         gen_graph_list = gen_graph_list[:len(self.test_graph_list)]
 
